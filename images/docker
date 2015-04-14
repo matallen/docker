@@ -1,0 +1,120 @@
+#!/bin/sh
+
+DIR=$2
+ACTION=$1
+TAG="mallen/$DIR"
+TAG_ROOT="mallen"
+
+function sanity {
+ if [ ! -d "$1" ]; then
+   echo "image \"$1\" doesn't exist. exiting."
+   exit 1
+ fi
+}
+
+function build {
+ if [ $( docker ps | grep $1 | wc -l ) -gt 0 ]; then
+   # Stop the container first
+   CID=`docker ps | grep $1 | awk '{print $1}'`
+   echo "[$1] Stopping container $CID"
+   docker stop $CID
+ fi
+ if [ $( docker ps -a | grep $1 | wc -l ) -gt 0 ]; then
+   # Stop the container first
+   CID=`docker ps -a | grep $1 | awk '{print $1}'`
+   echo "[$1] Removing container $CID"
+   docker rm $CID
+ fi
+# if [ $( docker images | grep $1 | wc -l ) -gt 0 ]; then
+#   IID=`docker images | grep $1 | awk '{print $3}'`
+#   echo "[$1] Removing image $IID"
+#   docker rmi $IID
+# fi
+ echo "[$1] CMD -> docker build -q --rm -t $1 $2"
+ docker build -q --rm -t $1 $2
+}
+
+function start {
+ # start script exists?
+ if [ ! -f "$1/start" ]; then
+  # If there isnt a stopped container
+  if [ ! $( docker ps -a | grep $TAG_ROOT/$1 | wc -l ) -gt 0 ]; then
+    # Create a new one
+    PORT=`cat $1/Dockerfile  | grep EXPOSE | awk '{ print $2 }'`
+    echo "[$1] Starting new container on port $PORT"
+    docker run -p $PORT:$PORT -h $TAG_ROOT/$1 --name $1 -d $TAG_ROOT/$1
+  else
+    # Start the existing one
+    echo "[$1] Starting existing container"
+    docker start $1
+  fi
+
+ else
+  ./$1/start
+ fi
+}
+
+function stop {
+ if [ $( docker ps | grep $TAG_ROOT/$1 | awk '{print $1}' | wc -l ) -gt 0 ]; then
+  # Running container exists
+  ID=`docker ps | grep $TAG_ROOT/$1 | awk '{print $1}'`
+  echo "[$1] Stopping container"
+  docker stop $ID
+ fi
+}
+
+function tail_logs {
+ if [ ! $( docker ps | grep $TAG_ROOT/$1 | awk '{print $1}' | wc -l ) -gt 0 ]; then
+  echo "Unable to tail logs - no container is running for $TAG_ROOT/$1"
+ fi
+ ID=`docker ps | grep $TAG_ROOT/$1 | awk '{print $1}'`
+ docker logs -f $ID
+}
+
+
+
+if [ "$1" == "ui" ]; then
+  # https://github.com/crosbymichael/dockerui
+  docker run -d -p 9000:9000 --privileged --name docker-ui -v /var/run/docker.sock:/var/run/docker.sock dockerui/dockerui
+  nohup firefox http://localhost:9000 &
+  exit 0
+fi
+
+sanity $2
+
+case "$1" in
+ start)
+  start "$2"
+  ;;
+ 
+ stop)
+  stop "$2"
+  ;;
+ 
+ build)
+  if [ "tomcat" == "$2" ] || [ "fuse" == "$2" ] || [ "firefox" == "$2" ] || [ "jenkins" == "$2" ] || [ "grafana-graphite-statsd" == "$2" ]; then
+   build "$TAG_ROOT/$2" "$2"
+  fi
+  ;;
+ 
+ tail)
+  tail_logs $2
+  ;;
+ 
+ *)
+  echo "usage: ./docker (build|start|stop|ui) <folder name containing Dockerfile>"
+  exit 1
+  ;;
+esac
+
+echo ""
+echo "****** RUNNING CONTAINERS ******"
+docker ps
+
+#if [ "tomcat" == "$1" ] || [ "fuse" == "$1" ] || [ "firefox" == "$1" ] || [ "grafana-graphite-statsd" == "$1" ]; then
+# build "$TAG" "$DIR"
+#else
+# echo "Either unknown image folder or it has not been vetted [$1]" 
+#fi
+
+

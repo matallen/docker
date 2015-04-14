@@ -1,0 +1,15 @@
+#¬/bin/sh
+
+if [ $(docker ps | grep docker-webapp | awk '{print $1}' | wc -l) -gt 0 ]; then 
+  echo "Stopping a running container for docker-webapp"
+  ID=`docker ps | grep docker-webapp | awk '{print $1}'`
+  docker stop $ID
+fi
+
+if [ $(docker ps -a | grep docker-webapp | awk '{print $1}' | wc -l) -gt 0 ]; then 
+  echo "Removing previous container for docker-webapp"
+  ID=`docker ps -a | grep docker-webapp | awk '{print $1}'`
+  docker rm $ID
+fi
+
+docker run -p 8080:8080 -h mallen/docker-webapp --name docker-webapp -d mallen/docker-webapp
