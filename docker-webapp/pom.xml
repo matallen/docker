@@ -22,7 +22,7 @@
 				<artifactId>docker-maven-plugin</artifactId>
 				<version>0.2.5</version>
 				<configuration>
-					<imageName>mallen/${artifactId}</imageName>
+					<imageName>mallen/${project.artifactId}</imageName>
 					<dockerDirectory>target/docker-resource</dockerDirectory>
 					<resources>
 						<resource>
