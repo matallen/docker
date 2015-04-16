@@ -47,7 +47,9 @@
 								<phase>package</phase>
 								<goals>
 									<goal>build</goal>
+									<!-- 
 									<goal>tag</goal>
+									 -->
 								</goals>
 							</execution>
 						</executions>
