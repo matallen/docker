@@ -6,52 +6,87 @@ TAG="mallen/$DIR"
 TAG_ROOT="mallen"
 
 function sanity {
+ if [ "$1" == "ui" ] || [ "$1"=="registry"  ]; then
+   return
+ fi
  if [ ! -d "$1" ]; then
    echo "image \"$1\" doesn't exist. exiting."
    exit 1
  fi
 }
 
-function build {
+function remove_image_if_exists {
+ if [ $( docker images | grep $1 | wc -l ) -gt 0 ]; then
+   IID=`docker images | grep $1 | awk '{print $3}'`
+   echo "[$1] Removing image $IID"
+   docker rmi $IID
+ fi
+}
+
+function remove_container_if_exists {
+ if [ $( docker ps -a | grep $1 | wc -l ) -gt 0 ]; then
+   # Remove the container
+   CID=`docker ps -a | grep $1 | awk '{print $1}'`
+   echo "[$1] Removing container $CID"
+   docker rm $CID
+ fi
+}
+
+function stop_container_if_running {
  if [ $( docker ps | grep $1 | wc -l ) -gt 0 ]; then
    # Stop the container first
    CID=`docker ps | grep $1 | awk '{print $1}'`
    echo "[$1] Stopping container $CID"
    docker stop $CID
  fi
- if [ $( docker ps -a | grep $1 | wc -l ) -gt 0 ]; then
-   # Stop the container first
-   CID=`docker ps -a | grep $1 | awk '{print $1}'`
-   echo "[$1] Removing container $CID"
-   docker rm $CID
- fi
-# if [ $( docker images | grep $1 | wc -l ) -gt 0 ]; then
-#   IID=`docker images | grep $1 | awk '{print $3}'`
-#   echo "[$1] Removing image $IID"
-#   docker rmi $IID
-# fi
+}
+
+
+function blast {
+ stop_container_if_running $1
+ remove_container_if_exists $1
+ remove_image_if_exists $1
+}
+
+function build {
+ stop_container_if_running $1
+ remove_container_if_exists $1
+# remove_image_if_exists $1
  echo "[$1] CMD -> docker build -q --rm -t $1 $2"
  docker build -q --rm -t $1 $2
 }
 
 function start {
- # start script exists?
- if [ ! -f "$1/start" ]; then
-  # If there isnt a stopped container
-  if [ ! $( docker ps -a | grep $TAG_ROOT/$1 | wc -l ) -gt 0 ]; then
-    # Create a new one
-    PORT=`cat $1/Dockerfile  | grep EXPOSE | awk '{ print $2 }'`
-    echo "[$1] Starting new container on port $PORT"
-    docker run -p $PORT:$PORT -h $TAG_ROOT/$1 --name $1 -d $TAG_ROOT/$1
-  else
-    # Start the existing one
-    echo "[$1] Starting existing container"
-    docker start $1
+  #If there is a running container, leave it
+  if [ $( docker ps | grep $TAG_ROOT/$1 | wc -l ) -gt 0 ]; then
+    echo "[$1] Already running. Exiting..."
+    exit
   fi
-
- else
-  ./$1/start
- fi
+  
+  #If there is a stopped container, just start it
+  if [ $( docker ps -a | grep $TAG_ROOT/$1 | wc -l ) -gt 0 ]; then
+    echo "[$1] Stopped container found, just re-starting it"
+    docker ps -a | grep $TAG_ROOT/$1 | awk '{print $1}' | xargs docker start
+    exit
+  fi
+  
+  if [ ! -f "$1/start" ]; then
+    #If there is no start script
+    PORT=`cat $1/Dockerfile  | grep EXPOSE | awk '{ print $2 }'`
+    if [ "x" == "x$PORT" ]; then
+      # No Port found
+      echo "[$1] Starting new container"
+      docker run -h $TAG_ROOT/$1 --name $1 -d $TAG_ROOT/$1
+    else
+      echo "[$1] Starting new container on port $PORT"
+      docker run -p $PORT:$PORT -h $TAG_ROOT/$1 --name $1 -d $TAG_ROOT/$1
+    fi
+  else
+    #If there is a start script, just run it
+    remove_container_if_exists $1
+    echo "[$1] Starting new container using start script"
+    ./$1/start
+  fi
 }
 
 function stop {
@@ -73,28 +108,66 @@ function tail_logs {
 
 
 
-if [ "$1" == "ui" ]; then
-  # https://github.com/crosbymichael/dockerui
-  docker run -d -p 9000:9000 --privileged --name docker-ui -v /var/run/docker.sock:/var/run/docker.sock dockerui/dockerui
-  nohup firefox http://localhost:9000 &
-  exit 0
-fi
+#if [ "$1" == "ui" ]; then
+#  # https://github.com/crosbymichael/dockerui
+#  docker run -d -p 9000:9000 --privileged --name docker-ui -v /var/run/docker.sock:/var/run/docker.sock dockerui/dockerui
+#  nohup firefox http://localhost:9000 &
+#  exit 0
+#fi
+
 
 sanity $2
 
 case "$1" in
+ enter)
+   CID=`docker ps | grep $TAG_ROOT/$2 | awk '{print $1}'`
+   if [ "x" != "x$CID" ]; then
+     sudo nsenter --target `docker inspect --format {{.State.Pid}} $CID` --mount --uts --ipc --net --pid
+   else
+     echo "[$2] Unable to find container id"
+   fi
+   
+ ;;
+ 
  start)
-  start "$2"
+  if [ "$2" == "registry" ]; then
+    docker run -d -p 5000:5000 --name docker-registry registry
+  elif [ "$2" == "ui" ]; then
+    # https://github.com/crosbymichael/dockerui
+    docker ps -a | grep docker-ui | awk '{print$1}' | xargs docker rm
+    docker run -d -p 9000:9000 --privileged --name docker-ui -v /var/run/docker.sock:/var/run/docker.sock dockerui/dockerui
+    nohup firefox http://localhost:9000 &
+  elif [ "$2" == "kanboard" ]; then
+    docker ps -a | grep kanboard | awk '{print$1}' | xargs docker rm
+    nohup docker run -p 9001:80 --name kanboard boomer/kanboard &
+    nohup firefox http://localhost:9001 &
+  else
+    start "$2"
+  fi
   ;;
  
  stop)
-  stop "$2"
+  if [ "$2" == "registry" ]; then
+    docker ps | grep docker-registry | awk '{print $1}' | xargs docker stop
+  elif [ "$2" == "ui" ]; then
+    docker ps | grep docker-ui | awk '{print $1}' | xargs docker stop
+  elif [ "$2" == "kanboard" ]; then
+    docker ps | grep kanboard | awk '{print $1}' | xargs docker stop
+  else
+    stop "$2"
+  fi
+  ;;
+ 
+ blast)
+  blast "$2"
   ;;
  
  build)
-  if [ "tomcat" == "$2" ] || [ "fuse" == "$2" ] || [ "firefox" == "$2" ] || [ "jenkins" == "$2" ] || [ "grafana-graphite-statsd" == "$2" ]; then
+  #if [ "tomcat" == "$2" ] || [ "fuse" == "$2" ] || [ "firefox" == "$2" ] || [ "jenkins" == "$2" ] || [ "grafana-graphite-statsd" == "$2" ]; then
    build "$TAG_ROOT/$2" "$2"
-  fi
+  #else
+  # echo "[$2] forbidden to build"
+  #fi
   ;;
  
  tail)
@@ -102,7 +175,7 @@ case "$1" in
   ;;
  
  *)
-  echo "usage: ./docker (build|start|stop|ui) <folder name containing Dockerfile>"
+  echo "usage: ./docker (build|start|stop|enter|ui|registry) <folder name containing Dockerfile>"
   exit 1
   ;;
 esac
