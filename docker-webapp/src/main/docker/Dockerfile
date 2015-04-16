@@ -32,7 +32,7 @@ RUN cd /tmp;wget -O tomcat.zip http://search.maven.org/remotecontent?filepath=or
 RUN cd /tmp;unzip tomcat.zip
 RUN cd /tmp;mv apache-tomcat-7.0.55 /opt/tomcat7
 RUN chmod -R 755 /opt/tomcat7
-ADD ${project.artifactId}.war /opt/tomcat7/webapps/${project.artifactId}.war
+ADD docker-webapp.war /opt/tomcat7/webapps/docker-webapp.war
 
 EXPOSE 8080
 
