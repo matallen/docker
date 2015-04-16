@@ -6,11 +6,11 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-
+				<!-- because the Dockerfile is not filtered by the plugin, so we filter it then used the filtered version in the build folder -->
+<!-- 
 	<build>
 		<resources>
 			<resource>
-				<!-- because the Dockerfile is not filtered by the plugin, so we filter it then used the filtered version in the build folder -->
 				<directory>src/main/docker</directory>
 				<targetPath>${project.build.directory}/docker-resource</targetPath>
 				<filtering>true</filtering>
@@ -18,6 +18,7 @@
 		</resources>
 		<finalName>${project.artifactId}</finalName>
 	</build>
+ -->
 	
 	<profiles>
 		<profile>
@@ -26,6 +27,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<build>
+			    <finalName>${project.artifactId}</finalName>
 				<plugins>
 					<plugin>
 						<groupId>com.spotify</groupId>
@@ -33,7 +35,7 @@
 						<version>0.2.5</version>
 						<configuration>
 							<imageName>mallen/${project.artifactId}</imageName>
-							<dockerDirectory>target/docker-resource</dockerDirectory>
+							<dockerDirectory>src/main/docker</dockerDirectory>
 							<resources>
 								<resource>
 									<targetPath>/</targetPath>
