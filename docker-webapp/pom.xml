@@ -7,7 +7,6 @@
 	<packaging>war</packaging>
 
 				<!-- because the Dockerfile is not filtered by the plugin, so we filter it then used the filtered version in the build folder -->
-<!-- 
 	<build>
 		<resources>
 			<resource>
@@ -18,7 +17,6 @@
 		</resources>
 		<finalName>${project.artifactId}</finalName>
 	</build>
- -->
 	
 	<profiles>
 		<profile>
@@ -35,7 +33,7 @@
 						<version>0.2.5</version>
 						<configuration>
 							<imageName>mallen/${project.artifactId}</imageName>
-							<dockerDirectory>src/main/docker</dockerDirectory>
+							<dockerDirectory>target/docker-resource</dockerDirectory>
 							<resources>
 								<resource>
 									<targetPath>/</targetPath>
