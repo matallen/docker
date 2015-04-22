@@ -8,17 +8,17 @@
 
 				<!-- because the Dockerfile is not filtered by the plugin, so we filter it then used the filtered version in the build folder -->
 	<!--
+	-->
 	<build>
 		<resources>
 			<resource>
 				<directory>src/main/docker</directory>
-				<targetPath>${project.build.directory}/docker-resource</targetPath>
+				<targetPath>${project.build.directory}/docker</targetPath>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
 		<finalName>${project.artifactId}</finalName>
 	</build>
-	-->
 	<profiles>
 		<profile>
 			<id>docker</id>
