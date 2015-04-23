@@ -1,4 +1,5 @@
-FROM    centos:centos6
+#FROM centos:centos6
+FROM fedora:20
 
 MAINTAINER mallen <mallen@redhat.com>
 
