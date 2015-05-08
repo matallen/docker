@@ -61,6 +61,9 @@
 						<artifactId>docker-maven-plugin</artifactId>
 						<version>3.0</version>
 						<configuration>
+						  <!-- 
+						  <provider>unix</provider>
+						   -->
 						</configuration>
 						<executions>
 							<execution>
