@@ -1,0 +1,23 @@
+# non shared docker
+#docker run --privileged -e PORT=4243 -p 8080:8080 --link nexus:nexus -h jenkins-ci-dind --name jenkins-ci-dind -d mallen/jenkins-ci-dind
+
+# shared docker
+#docker run --privileged -t -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker -p 8080:8080 --link nexus:nexus -h jenkins-ci-dind --name jenkins-ci-dind -d mallen/jenkins-ci-dind
+
+
+# -t = Allocate a pseudo-TTY
+# -v = Bind mount a volume (e.g., from the host: -v /host:/container, from Docker: -v /container)
+# -p = Publish a container's port to the host
+#                               format: ip:hostPort:containerPort | ip::containerPort | hostPort:containerPort | containerPort
+#                               (use 'docker port' to see the actual mapping)
+# --privileged =Give extended privileges to this container
+# -h = Container host name
+# -d = Detached mode: run the container in the background and print the new container ID
+# --name = Assign a name to the container 
+
+NAME=jenkins-ci
+# http://registry-dev:5000/v1.12/build?t=mallen/docker-webapp
+# --link dind:dind
+# --link registry:registry
+#
+docker run --privileged -t -p 8080:8080 --link nexus:nexus --link registry:registry -v /var/run/docker.sock:/var/run/docker.sock -h $NAME --name $NAME -d mallen/$NAME

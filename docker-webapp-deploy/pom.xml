@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.mallen</groupId>
+	<artifactId>docker-webapp-deploy</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<properties>
+		<container>docker-webapp</container>
+		<image>mallen/${container}</image>
+	</properties>
+
+	<profiles>
+	   <profile>
+	       <id>deploy</id>
+	       <activation>
+	           <activeByDefault>true</activeByDefault>
+	       </activation>
+	       <build>
+	           <plugins>
+	               <plugin>
+                        <groupId>net.wouterdanes.docker</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>3.0</version>
+                        <executions>
+                            <execution>
+                                <id>start</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>start-containers</goal>
+                                </goals>
+                                <configuration>
+                                    <containers>
+                                        <container>
+                                            <id>${container}</id>
+                                            <image>${image}</image>
+                                        </container>
+                                    </containers>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+	           </plugins>
+	       </build>
+	   </profile>
+	</profiles>
+
+</project>

@@ -1,0 +1,1 @@
+docker ps | grep mallen/grafana-graphite-statsd | awk ' {print }' | xargs docker stop

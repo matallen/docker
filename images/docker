@@ -76,7 +76,8 @@ function start {
     if [ "x" == "x$PORT" ]; then
       # No Port found
       echo "[$1] Starting new container"
-      docker run -h $TAG_ROOT/$1 --name $1 -d $TAG_ROOT/$1
+      #docker run -h $TAG_ROOT/$1 --name $1 -d $TAG_ROOT/$1
+      docker run -h $1 --name $1 -d $TAG_ROOT/$1
     else
       echo "[$1] Starting new container on port $PORT"
       docker run -p $PORT:$PORT -h $TAG_ROOT/$1 --name $1 -d $TAG_ROOT/$1
@@ -120,7 +121,7 @@ sanity $2
 
 case "$1" in
  enter)
-   CID=`docker ps | grep $TAG_ROOT/$2 | awk '{print $1}'`
+   CID=`docker ps | grep $2 | awk '{print $1}'`
    if [ "x" != "x$CID" ]; then
      sudo nsenter --target `docker inspect --format {{.State.Pid}} $CID` --mount --uts --ipc --net --pid
    else
@@ -131,16 +132,41 @@ case "$1" in
  
  start)
   if [ "$2" == "registry" ]; then
-    docker run -d -p 5000:5000 --name docker-registry registry
+    
+    if [ $( docker ps -a | grep " registry " | wc -l ) -gt 0 ]; then
+      echo "[$2] Stopped container found, just re-starting it"
+      docker ps -a | grep " registry " | awk '{print $1}' | xargs docker start
+    else
+      docker run -d -p 5000:5000 -v /tmp/registry:/tmp/registry --name registry registry
+    fi
+    
+    #if [ "$3" == "dev" ]; then
+    #  docker run -d -p 5000:5000 --name registry-dev registry
+    #elif [ "$3" == "prod" ]; then
+    #  docker run -d -p 5001:5000 --name registry-prod registry
+#    else
+#      echo "Please supply a 3rd parameter specifying [dev|prod]"
+#      exit 0
+    #fi
+  elif [ "$2" == "registry-ui" ]; then
+    # https://registry.hub.docker.com/u/atcol/docker-registry-ui/
+    stop_container_if_running registry-ui
+    remove_container_if_exists registry-ui
+    #LINKS="--link registry-dev:registry-dev"
+    #--link registry-dev:registry-dev --link registry-prod:registry-prod
+    #-e REG2=http://localhost:5001/v1/
+    #docker run -p 5002:8080 -d --name registry-ui --link registry:registry -e REG1=http://registry:5000/v1/ atcol/docker-registry-ui
+    docker run -p 5002:8080 -d --name registry-ui --link registry:registry -e REG1=http://172.17.0.2:5000/v1/ atcol/docker-registry-ui
+    nohup firefox http://localhost:5002 &
   elif [ "$2" == "ui" ]; then
     # https://github.com/crosbymichael/dockerui
     docker ps -a | grep docker-ui | awk '{print$1}' | xargs docker rm
-    docker run -d -p 9000:9000 --privileged --name docker-ui -v /var/run/docker.sock:/var/run/docker.sock dockerui/dockerui
-    nohup firefox http://localhost:9000 &
+    docker run -d -p 5003:9000 --privileged --name docker-ui -v /var/run/docker.sock:/var/run/docker.sock dockerui/dockerui
+    nohup firefox http://localhost:5003 &
   elif [ "$2" == "kanboard" ]; then
     docker ps -a | grep kanboard | awk '{print$1}' | xargs docker rm
     nohup docker run -p 9001:80 --name kanboard boomer/kanboard &
-    nohup firefox http://localhost:9001 &
+    nohup firefox http://localhost:9001/?controller=board &
   else
     start "$2"
   fi
@@ -148,7 +174,15 @@ case "$1" in
  
  stop)
   if [ "$2" == "registry" ]; then
-    docker ps | grep docker-registry | awk '{print $1}' | xargs docker stop
+    docker ps | grep registry | awk '{print $1}' | xargs docker stop
+    #if [ "$3" == "dev" ] || [ "$3" == "prod" ]; then
+    #  docker ps | grep registry-$3 | awk '{print $1}' | xargs docker stop
+#    else
+#      echo "Please supply a 3rd parameter specifying [dev|prod]"
+#      exit 0
+    #fi
+  elif [ "$2" == "registry-ui" ]; then
+    docker ps | grep registry-ui | awk '{print $1}' | xargs docker stop
   elif [ "$2" == "ui" ]; then
     docker ps | grep docker-ui | awk '{print $1}' | xargs docker stop
   elif [ "$2" == "kanboard" ]; then
