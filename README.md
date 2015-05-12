@@ -3,7 +3,7 @@
 
 ### Purpose
 
-This repository stores my docker images and associated projects for application development using containers (currently docker).
+This repository stores my docker images and associated projects for **application development using containers** (currently docker).
 
 
 ### Architecture of Container Interactions
