@@ -7,5 +7,5 @@ This repository stores my docker images and associated projects for application 
 
 
 ### Architecture of Container Interactions
-![alt text](https://github.com/matallen/docker/app-dev-component-arch.png "AppDev Component Architecture with Docker")
+![AppDev Component Architecture with Docker](https://github.com/matallen/docker/blob/master/app-dev-component-arch.png "AppDev Component Architecture with Docker")
 
