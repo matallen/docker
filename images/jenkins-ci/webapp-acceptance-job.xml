@@ -68,7 +68,7 @@
       <evenIfUnstable>false</evenIfUnstable>
     </hudson.maven.RedeployPublisher>
     <hudson.tasks.BuildTrigger>
-      <childProjects>webapp-sonar</childProjects>
+      <childProjects>webapp-deploy-to-dev</childProjects>
       <threshold>
         <name>SUCCESS</name>
         <ordinal>0</ordinal>
@@ -79,7 +79,13 @@
   </publishers>
   <buildWrappers/>
   <prebuilders/>
-  <postbuilders/>
+  <postbuilders>
+    <hudson.tasks.Shell>
+      <command>docker tag -f mallen/docker-webapp 172.17.0.2:5000/mallen/docker-webapp:${BUILD_NUMBER}
+docker push 172.17.0.2:5000/mallen/docker-webapp:${BUILD_NUMBER}
+</command>
+    </hudson.tasks.Shell>
+  </postbuilders>
   <runPostStepsIfResult>
     <name>FAILURE</name>
     <ordinal>2</ordinal>

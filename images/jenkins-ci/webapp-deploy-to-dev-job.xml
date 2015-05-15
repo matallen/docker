@@ -39,10 +39,10 @@
   <concurrentBuild>false</concurrentBuild>
   <rootModule>
     <groupId>com.mallen</groupId>
-    <artifactId>docker-webapp</artifactId>
+    <artifactId>docker-webapp-deploy</artifactId>
   </rootModule>
-  <rootPOM>docker-webapp/pom.xml</rootPOM>
-  <goals>clean package</goals>
+  <rootPOM>docker-webapp-deploy/pom.xml</rootPOM>
+  <goals>clean install -Pdeploy -Ddocker.host=192.168.122.115 -Ddocker.port=4243</goals>
   <aggregatorStyleBuild>true</aggregatorStyleBuild>
   <incrementalBuild>false</incrementalBuild>
   <ignoreUpstremChanges>true</ignoreUpstremChanges>
@@ -68,7 +68,7 @@
       <evenIfUnstable>false</evenIfUnstable>
     </hudson.maven.RedeployPublisher>
     <hudson.tasks.BuildTrigger>
-      <childProjects>webapp-acceptance</childProjects>
+      <childProjects>webapp-sonar</childProjects>
       <threshold>
         <name>SUCCESS</name>
         <ordinal>0</ordinal>
@@ -79,11 +79,11 @@
   </publishers>
   <buildWrappers/>
   <prebuilders/>
-  <postbuilders/>>
+  <postbuilders/>
   <runPostStepsIfResult>
-    <name>SUCCESS</name>
-    <ordinal>0</ordinal>
-    <color>BLUE</color>
+    <name>FAILURE</name>
+    <ordinal>2</ordinal>
+    <color>RED</color>
     <completeBuild>true</completeBuild>
   </runPostStepsIfResult>
 </maven2-moduleset>

@@ -80,7 +80,8 @@ function start {
       docker run -h $1 --name $1 -d $TAG_ROOT/$1
     else
       echo "[$1] Starting new container on port $PORT"
-      docker run -p $PORT:$PORT -h $TAG_ROOT/$1 --name $1 -d $TAG_ROOT/$1
+      docker run -p $PORT:$PORT --hostname $1 --name $1 -d $TAG_ROOT/$1
+# --net=host
     fi
   else
     #If there is a start script, just run it
