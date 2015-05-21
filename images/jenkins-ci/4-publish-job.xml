@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>
+CID=`docker ps | grep "registry " | awk '{print $1}'`
+REG_IP_ADDR=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' $CID`
+docker tag -f mallen/docker-webapp $REG_IP_ADDR:5000/mallen/docker-webapp:${BUILD_NUMBER}
+docker push $REG_IP_ADDR:5000/mallen/docker-webapp:${BUILD_NUMBER}
+#172.17.0.4
+#docker tag -f mallen/docker-webapp 172.17.0.2:5000/mallen/docker-webapp:${BUILD_NUMBER}
+#docker push 172.17.0.2:5000/mallen/docker-webapp:${BUILD_NUMBER}
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.BuildTrigger>
+      <childProjects>5-webapp-deploy-to-dev</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+        <completeBuild>true</completeBuild>
+      </threshold>
+    </hudson.tasks.BuildTrigger>
+  </publishers>
+  <buildWrappers/>
+</project>

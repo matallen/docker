@@ -21,3 +21,9 @@ NAME=jenkins-ci
 # --link registry:registry
 #
 docker run --privileged -t -p 8080:8080 --link nexus:nexus --link registry:registry -v /var/run/docker.sock:/var/run/docker.sock -h $NAME --name $NAME -d mallen/$NAME
+
+# Cant use links and --net=host
+#docker run --privileged -t -p 8080:8080 --link nexus:nexus --link registry:registry -v /var/run/docker.sock:/var/run/docker.sock --name $NAME --net=host -d mallen/$NAME
+
+# Gets me on the same network but without links
+#docker run --privileged -t -p 8080:8080  -v /var/run/docker.sock:/var/run/docker.sock --name $NAME --net=host -d mallen/$NAME

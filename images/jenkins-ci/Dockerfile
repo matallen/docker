@@ -9,7 +9,7 @@ ADD config.xml /var/lib/jenkins/config.xml
 RUN mkdir -p /var/lib/jenkins/plugins
 RUN wget -O /var/lib/jenkins/plugins/jquery.hpi http://updates.jenkins-ci.org/download/plugins/jquery/1.11.2-0/jquery.hpi
 RUN wget -O /var/lib/jenkins/plugins/parameterized-trigger.hpi http://updates.jenkins-ci.org/download/plugins/parameterized-trigger/2.25/parameterized-trigger.hpi
-RUN wget -O /var/lib/jenkins/plugins/build-pipeline-plugin.hpi http://updates.jenkins-ci.org/download/plugins/build-pipeline-plugin/1.4.3/build-pipeline-plugin.hpi
+RUN wget -O /var/lib/jenkins/plugins/build-pipeline-plugin.hpi http://updates.jenkins-ci.org/download/plugins/build-pipeline-plugin/1.4.7/build-pipeline-plugin.hpi
 #RUN wget -O /var/lib/jenkins/plugins/sonar.hpi http://updates.jenkins-ci.org/download/plugins/sonar/2.1/sonar.hpi
 RUN wget -O /var/lib/jenkins/plugins/docker-build-step.hpi http://updates.jenkins-ci.org/download/plugins/docker-build-step/1.22/docker-build-step.hpi
 RUN wget -O /var/lib/jenkins/plugins/envinject.hpi http://updates.jenkins-ci.org/download/plugins/envinject/1.91.2/envinject.hpi
@@ -22,10 +22,16 @@ RUN wget -O /var/lib/jenkins/plugins/envinject.hpi http://updates.jenkins-ci.org
 
 #ADD sonar.xml /var/lib/jenkins/hudson.plugins.sonar.SonarPublisher.xml
 
-RUN mkdir -p /var/lib/jenkins/jobs/webapp-trunk
-ADD webapp-trunk-job.xml /var/lib/jenkins/jobs/webapp-trunk/config.xml
-RUN mkdir -p /var/lib/jenkins/jobs/webapp-acceptance
-ADD webapp-acceptance-job.xml /var/lib/jenkins/jobs/webapp-acceptance/config.xml
+RUN mkdir -p /var/lib/jenkins/jobs/1-webapp-build
+ADD 1-build-job.xml /var/lib/jenkins/jobs/1-webapp-build/config.xml
+RUN mkdir -p /var/lib/jenkins/jobs/2-webapp-package
+ADD 2-package-job.xml /var/lib/jenkins/jobs/2-webapp-package/config.xml
+RUN mkdir -p /var/lib/jenkins/jobs/3-webapp-acceptance-test
+ADD 3-acceptance-test-job.xml /var/lib/jenkins/jobs/3-webapp-acceptance-test/config.xml
+RUN mkdir -p /var/lib/jenkins/jobs/4-webapp-publish
+ADD 4-publish-job.xml /var/lib/jenkins/jobs/4-webapp-publish/config.xml
+RUN mkdir -p /var/lib/jenkins/jobs/5-webapp-deploy-to-dev
+ADD 5-deploy-to-dev-job.xml /var/lib/jenkins/jobs/5-webapp-deploy-to-dev/config.xml
 
 
 #Run Jenkins as jenkins user

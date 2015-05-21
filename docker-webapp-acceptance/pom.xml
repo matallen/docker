@@ -6,11 +6,6 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<properties>
-		<container>docker-webapp</container>
-		<image>mallen/${container}</image>
-	</properties>
-
 	<profiles>
 		<profile>
 			<id>docker</id>
@@ -38,6 +33,12 @@
                             <includes>
                                 <include>**/*Test.java</include>
                             </includes>
+                            
+                            <!-- pass container host:port to unit tests -->
+		                    <systemProperties>
+		                        <docker-webapp.url>http://${docker.containers.docker-webapp.ports.8080/tcp.host}:${docker.containers.docker-webapp.ports.8080/tcp.port}</docker-webapp.url>
+		                    </systemProperties>
+                            
                         </configuration>
                         <executions>
                             <execution>
@@ -75,8 +76,8 @@
 								<configuration>
 									<containers>
 										<container>
-											<id>${container}</id>
-											<image>${image}</image>
+											<id>docker-webapp</id>
+											<image>mallen/docker-webapp</image>
 										</container>
 									</containers>
 								</configuration>

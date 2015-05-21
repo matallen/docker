@@ -29,7 +29,7 @@
   <canRoam>true</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
-  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>true</blockBuildWhenUpstreamBuilding>
   <triggers>
     <hudson.triggers.SCMTrigger>
       <spec>H/5 * * * *</spec>
@@ -39,10 +39,10 @@
   <concurrentBuild>false</concurrentBuild>
   <rootModule>
     <groupId>com.mallen</groupId>
-    <artifactId>docker-webapp-acceptance</artifactId>
+    <artifactId>docker-webapp</artifactId>
   </rootModule>
-  <rootPOM>docker-webapp-acceptance/pom.xml</rootPOM>
-  <goals>clean install -Ddocker.host=localhost -Ddocker.port=4243</goals>
+  <rootPOM>docker-webapp/pom.xml</rootPOM>
+  <goals>clean package</goals>
   <aggregatorStyleBuild>true</aggregatorStyleBuild>
   <incrementalBuild>false</incrementalBuild>
   <ignoreUpstremChanges>true</ignoreUpstremChanges>
@@ -68,7 +68,7 @@
       <evenIfUnstable>false</evenIfUnstable>
     </hudson.maven.RedeployPublisher>
     <hudson.tasks.BuildTrigger>
-      <childProjects>webapp-deploy-to-dev</childProjects>
+      <childProjects>2-webapp-package</childProjects>
       <threshold>
         <name>SUCCESS</name>
         <ordinal>0</ordinal>
@@ -79,17 +79,11 @@
   </publishers>
   <buildWrappers/>
   <prebuilders/>
-  <postbuilders>
-    <hudson.tasks.Shell>
-      <command>docker tag -f mallen/docker-webapp 172.17.0.2:5000/mallen/docker-webapp:${BUILD_NUMBER}
-docker push 172.17.0.2:5000/mallen/docker-webapp:${BUILD_NUMBER}
-</command>
-    </hudson.tasks.Shell>
-  </postbuilders>
+  <postbuilders/>
   <runPostStepsIfResult>
-    <name>FAILURE</name>
-    <ordinal>2</ordinal>
-    <color>RED</color>
+    <name>SUCCESS</name>
+    <ordinal>0</ordinal>
+    <color>BLUE</color>
     <completeBuild>true</completeBuild>
   </runPostStepsIfResult>
 </maven2-moduleset>
