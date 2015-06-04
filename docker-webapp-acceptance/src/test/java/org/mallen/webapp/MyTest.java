@@ -33,6 +33,7 @@ public class MyTest{
 //    System.out.println("host="+System.getProperty("docker.containers.docker-webapp.ports.8080/tcp.host"));
 //    System.out.println("port="+System.getProperty("docker.containers.docker-webapp.ports.8080/tcp.port"));
 //    System.out.println("docker-webapp.url="+System.getProperty("docker-webapp.url"));
+    System.out.println("Sleeping 5 seconds");
     Thread.sleep(5000l); // because i'm getting intermittant failures in Jenkins and im wondering if its container startup time
     String dockerWebAppUrl=System.getProperty("docker-webapp.url");
     String BASE;
