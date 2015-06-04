@@ -56,6 +56,12 @@
   <globalSettings class="jenkins.mvn.DefaultGlobalSettingsProvider"/>
   <reporters/>
   <publishers>
+    <hudson.maven.RedeployPublisher>
+      <id>deployment</id>
+      <url>http://nexus:8081/nexus/content/repositories/snapshots/</url>
+      <uniqueVersion>true</uniqueVersion>
+      <evenIfUnstable>false</evenIfUnstable>
+    </hudson.maven.RedeployPublisher>
     <hudson.tasks.BuildTrigger>
       <childProjects>3-webapp-acceptance-test</childProjects>
       <threshold>
