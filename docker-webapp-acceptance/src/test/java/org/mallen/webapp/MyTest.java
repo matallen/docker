@@ -33,12 +33,22 @@ public class MyTest{
 //    System.out.println("host="+System.getProperty("docker.containers.docker-webapp.ports.8080/tcp.host"));
 //    System.out.println("port="+System.getProperty("docker.containers.docker-webapp.ports.8080/tcp.port"));
 //    System.out.println("docker-webapp.url="+System.getProperty("docker-webapp.url"));
-    String BASE=System.getProperty("docker-webapp.url")!=null?System.getProperty("docker-webapp.url"):DEFAULT_URL;
+    
+    String dockerWebAppUrl=System.getProperty("docker-webapp.url");
+    String BASE;
+    if (dockerWebAppUrl==null){
+      System.out.println("Could not find 'dockerWebAppUrl' system property, reverting to default values");
+      BASE=DEFAULT_URL;
+    }else{
+      BASE=dockerWebAppUrl;
+    }
+    
     String url=BASE+"/docker-webapp/version";
 //    System.out.println("URL     ="+url);
+    System.out.println("Acceptance: Calling to "+url);
     String response=new Http().get(url);
 //    System.out.println("RESPONSE="+response);
-    
+    System.out.println("Acceptance: response was "+(response==null?"NULL! (FAILURE)":"not null (SUCCESS)"));
     Assert.assertNotNull(response);
     
 //    for(Entry<String, String> e:System.getenv().entrySet()){
