@@ -6,11 +6,6 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<properties>
-		<container>docker-webapp</container>
-		<image>mallen/${container}</image>
-	</properties>
-
 	<profiles>
 	   <profile>
 	       <id>deploy</id>
@@ -33,8 +28,8 @@
                                 <configuration>
                                     <containers>
                                         <container>
-                                            <id>${container}</id>
-                                            <image>${image}</image>
+                                            <id>docker-webapp</id>
+                                            <image>mallen/docker-webapp</image>
                                         </container>
                                     </containers>
                                 </configuration>

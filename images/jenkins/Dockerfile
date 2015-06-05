@@ -2,6 +2,9 @@
 #FROM mallen/dind
 FROM fedora:20
 
+# each line is an image, so try to do a lot on a single line
+# yum clean all must be on the same line as yum install
+
 MAINTAINER Mat Allen <mallen@redhat.com>
 
 USER root
