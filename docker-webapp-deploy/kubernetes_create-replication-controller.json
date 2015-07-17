@@ -1,0 +1,37 @@
+{
+  "apiVersion" : "v1beta3",
+  "kind" : "ReplicationController",
+  "metadata":{
+    "name":"mat-master",
+    "labels":{
+      "name":"mat-master"
+    }
+  },
+  "spec":{
+      "replicas":1,
+      "selector":{
+         "name":"webapp-rc"
+      },
+      "template":{
+         "metadata":{
+            "labels":{
+               "name":"webapp-rc"
+            }
+         },
+         "spec":{
+            "containers":[
+               {
+                  "name":"master",
+                  "image":"mallen/docker-webapp",
+                  "ports":[
+                     {
+                        "containerPort":8080,
+                        "protocol":"TCP"
+                     }
+                  ]
+               }
+            ]
+         }
+      }
+   }
+}

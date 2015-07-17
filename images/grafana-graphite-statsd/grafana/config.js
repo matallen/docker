@@ -16,7 +16,7 @@ function (Settings) {
     },
 
     // default start dashboard
-    default_route: '/dashboard/db/welcome',
+    default_route: '/dashboard/file/default.json',
 
     // Elasticsearch index for storing dashboards
     grafana_index: "grafana-dash",

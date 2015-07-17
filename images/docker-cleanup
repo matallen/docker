@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker rm $(docker ps -a -q)
+docker images -q --filter "dangling=true" | xargs docker rmi

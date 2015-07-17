@@ -1,0 +1,7 @@
+
+
+./docker start registry 
+./docker start registry-ui
+./docker start nexus
+./docker start jenkins-ci
+

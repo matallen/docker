@@ -1,0 +1,22 @@
+{
+   "kind":"Service",
+   "apiVersion":"v1beta3",
+   "metadata":{
+      "name":"webapp-service",
+      "labels":{
+         "name":"webapp-service"
+      }
+   },
+   "spec":{
+      "ports": [
+        {
+          "port":8080,
+          "targetPort":8080,
+          "protocol":"TCP"
+        }
+      ],
+      "selector":{
+         "name":"webapp-rc"
+      }
+   }
+}
