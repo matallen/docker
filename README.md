@@ -1,4 +1,4 @@
-![Analytics Tracker](http://76.182.243.72:8090/solution-tracker/api/track/solutionX?user=mallen&region=na "Analytics Tracker")
+![Analytics Tracker](http://76.182.243.72:8090/solution-tracker/api/track/solutionX-github-README.MD "Analytics Tracker")
 
 # docker stuff
 
