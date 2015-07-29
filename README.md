@@ -4,6 +4,8 @@
 
 [logo] http://76.182.243.72:8090/solution-tracker/api/track/Container_Foundations/docker_stuff_on_github "analytics beacon"
 
+![alt text](http://76.182.243.72:8090/solution-tracker/api/track/Container_Foundations/docker_stuff_on_github "Logo Title Text 1")
+
 
 
 
